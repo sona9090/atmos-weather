@@ -35,7 +35,7 @@ export default function App() {
   const [language, setLanguage] = useLocalStorage<Language>('atmos-language', 'ru');
   const [location, setLocation] = useState<Location>(() => getDefaultLocation(language));
   const [unit, setUnit] = useLocalStorage<TemperatureUnit>('atmos-unit', 'celsius');
-  const [storedTheme, setStoredTheme] = useLocalStorage<StoredTheme>('atmos-theme', 'light');
+  const [storedTheme, setStoredTheme] = useLocalStorage<StoredTheme>('atmos-theme', 'gothic');
   const [favorites, setFavorites] = useLocalStorage<Location[]>('atmos-favorites', []);
   const [locating, setLocating] = useState(false);
   const [isThemeSelectOpen, setThemeSelectOpen] = useState(false);
