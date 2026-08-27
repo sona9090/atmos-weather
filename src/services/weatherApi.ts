@@ -1,5 +1,6 @@
 import type {
   Location,
+  Language,
   TemperatureUnit,
   WeatherData,
 } from '../types/weather';
@@ -67,7 +68,11 @@ async function getJson<T>(url: URL, signal?: AbortSignal): Promise<T> {
   return response.json() as Promise<T>;
 }
 
-export async function searchCities(query: string, signal?: AbortSignal): Promise<Location[]> {
+export async function searchCities(
+  query: string,
+  language: Language,
+  signal?: AbortSignal,
+): Promise<Location[]> {
   const trimmedQuery = query.trim();
   if (trimmedQuery.length < 2) return [];
 
@@ -75,7 +80,7 @@ export async function searchCities(query: string, signal?: AbortSignal): Promise
   url.search = new URLSearchParams({
     name: trimmedQuery,
     count: '6',
-    language: 'ru',
+    language,
     format: 'json',
   }).toString();
 

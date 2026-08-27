@@ -1,18 +1,21 @@
-import type { CurrentWeatherData, Location, WeatherData } from '../../types/weather';
+import type { TranslationSet } from '../../i18n/translations';
+import type { CurrentWeatherData, Language, Location, WeatherData } from '../../types/weather';
 import { getWeatherCodeInfo, getWindDirection } from '../../utils/weatherCode';
 
 interface CurrentWeatherProps {
   location: Location;
   weather: WeatherData;
+  language: Language;
+  translations: TranslationSet['current'];
   isFavorite: boolean;
   locating: boolean;
   onToggleFavorite: () => void;
   onUseLocation: () => void;
 }
 
-function formatLocalDate(current: CurrentWeatherData) {
+function formatLocalDate(current: CurrentWeatherData, language: Language) {
   const date = new Date(`${current.time.slice(0, 10)}T12:00:00`);
-  const formatted = new Intl.DateTimeFormat('ru-RU', {
+  const formatted = new Intl.DateTimeFormat(language === 'ru' ? 'ru-RU' : 'en-US', {
     weekday: 'long',
     day: 'numeric',
     month: 'long',
@@ -24,19 +27,21 @@ function formatLocalDate(current: CurrentWeatherData) {
 export function CurrentWeather({
   location,
   weather,
+  language,
+  translations,
   isFavorite,
   locating,
   onToggleFavorite,
   onUseLocation,
 }: CurrentWeatherProps) {
-  const condition = getWeatherCodeInfo(weather.current.weatherCode, weather.current.isDay);
+  const condition = getWeatherCodeInfo(weather.current.weatherCode, weather.current.isDay, language);
   const today = weather.daily[0];
 
   return (
     <>
       <section className="hero" aria-labelledby="location-title">
         <div className="hero-copy">
-          <p className="eyebrow"><span>●</span>{formatLocalDate(weather.current)}</p>
+          <p className="eyebrow"><span>●</span>{formatLocalDate(weather.current, language)}</p>
           <div className="location-heading">
             <div>
               <h1 id="location-title">{location.name}</h1>
@@ -46,8 +51,8 @@ export function CurrentWeather({
               className={isFavorite ? 'favorite-button active' : 'favorite-button'}
               type="button"
               onClick={onToggleFavorite}
-              aria-label={isFavorite ? 'Удалить город из избранного' : 'Добавить город в избранное'}
-              title={isFavorite ? 'Удалить из избранного' : 'Добавить в избранное'}
+              aria-label={isFavorite ? translations.favoriteRemove : translations.favoriteAdd}
+              title={isFavorite ? translations.favoriteRemove : translations.favoriteAdd}
             >
               {isFavorite ? '★' : '☆'}
             </button>
@@ -56,12 +61,12 @@ export function CurrentWeather({
             <span className="weather-symbol" aria-hidden="true">{condition.symbol}</span>
             <div>
               <strong>{condition.label}</strong>
-              <span>Ощущается как {Math.round(weather.current.apparentTemperature)}°</span>
+              <span>{translations.feelsLike} {Math.round(weather.current.apparentTemperature)}°</span>
             </div>
           </div>
         </div>
 
-        <div className="temperature" aria-label={`Температура ${Math.round(weather.current.temperature)} градусов`}>
+        <div className="temperature" aria-label={`${translations.temperature} ${Math.round(weather.current.temperature)} ${translations.degrees}`}>
           <span>{Math.round(weather.current.temperature)}</span><sup>°</sup>
         </div>
 
@@ -76,27 +81,27 @@ export function CurrentWeather({
         )}
       </section>
 
-      <section className="highlights" aria-label="Подробности погоды">
+      <section className="highlights" aria-label={translations.detailsAria}>
         <article className="highlight-card">
-          <p>Влажность</p>
+          <p>{translations.humidity}</p>
           <strong>{weather.current.humidity}%</strong>
-          <span>{weather.current.humidity < 60 ? 'Комфортный уровень' : 'Повышенная'}</span>
+          <span>{weather.current.humidity < 60 ? translations.comfortable : translations.elevated}</span>
         </article>
         <article className="highlight-card">
-          <p>Ветер</p>
+          <p>{translations.wind}</p>
           <strong>{Math.round(weather.current.windSpeed)} {weather.windSpeedUnit}</strong>
-          <span>{getWindDirection(weather.current.windDirection)} · {Math.round(weather.current.windDirection)}°</span>
+          <span>{getWindDirection(weather.current.windDirection, language)} · {Math.round(weather.current.windDirection)}°</span>
         </article>
         <article className="highlight-card">
-          <p>Давление</p>
-          <strong>{Math.round(weather.current.pressure)} гПа</strong>
-          <span>На уровне моря</span>
+          <p>{translations.pressure}</p>
+          <strong>{Math.round(weather.current.pressure)} {language === 'ru' ? 'гПа' : 'hPa'}</strong>
+          <span>{translations.seaLevel}</span>
         </article>
         <button className="location-button" type="button" onClick={onUseLocation} disabled={locating}>
           <span aria-hidden="true">{locating ? '…' : '⌖'}</span>
           <span>
-            <strong>{locating ? 'Определяем…' : 'Моё местоположение'}</strong>
-            <small>Определить автоматически</small>
+            <strong>{locating ? translations.locating : translations.myLocation}</strong>
+            <small>{translations.detectAutomatically}</small>
           </span>
         </button>
       </section>

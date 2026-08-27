@@ -1,18 +1,20 @@
+import type { TranslationSet } from '../../i18n/translations';
 import type { Location } from '../../types/weather';
 
 interface FavoritesProps {
   favorites: Location[];
   currentLocationId: Location['id'];
+  translations: TranslationSet['favorites'];
   onSelect: (location: Location) => void;
 }
 
-export function Favorites({ favorites, currentLocationId, onSelect }: FavoritesProps) {
+export function Favorites({ favorites, currentLocationId, translations, onSelect }: FavoritesProps) {
   return (
     <section className="favorites-section" aria-labelledby="favorites-title">
       <div className="favorites-heading">
         <div>
-          <p className="section-kicker">Сохранённые места</p>
-          <h2 id="favorites-title">Избранное</h2>
+          <p className="section-kicker">{translations.kicker}</p>
+          <h2 id="favorites-title">{translations.title}</h2>
         </div>
         <span>{favorites.length} / 5</span>
       </div>
@@ -21,8 +23,8 @@ export function Favorites({ favorites, currentLocationId, onSelect }: FavoritesP
         <div className="favorites-empty">
           <span aria-hidden="true">☆</span>
           <div>
-            <strong>Здесь пока пусто</strong>
-            <p>Нажмите звезду рядом с названием города, чтобы сохранить его.</p>
+            <strong>{translations.emptyTitle}</strong>
+            <p>{translations.emptyHint}</p>
           </div>
         </div>
       ) : (

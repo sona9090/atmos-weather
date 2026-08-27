@@ -1,6 +1,8 @@
 export type TemperatureUnit = 'celsius' | 'fahrenheit';
 
-export type DesignTheme = 'atmos' | 'gothic';
+export type DesignTheme = 'light' | 'dark';
+
+export type Language = 'ru' | 'en';
 
 export type WeatherMood =
   | 'clear'

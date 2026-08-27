@@ -1,12 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
+import type { TranslationSet } from '../../i18n/translations';
 import { searchCities } from '../../services/weatherApi';
-import type { Location } from '../../types/weather';
+import type { Language, Location } from '../../types/weather';
 
 interface SearchBarProps {
+  language: Language;
+  translations: TranslationSet['search'];
   onSelect: (location: Location) => void;
 }
 
-export function SearchBar({ onSelect }: SearchBarProps) {
+export function SearchBar({ language, translations, onSelect }: SearchBarProps) {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<Location[]>([]);
   const [loading, setLoading] = useState(false);
@@ -50,7 +53,7 @@ export function SearchBar({ onSelect }: SearchBarProps) {
     setLoading(true);
     const timeoutId = window.setTimeout(async () => {
       try {
-        const cities = await searchCities(trimmedQuery, controller.signal);
+        const cities = await searchCities(trimmedQuery, language, controller.signal);
         setResults(cities);
         setHasSearched(true);
         setActiveIndex(-1);
@@ -70,7 +73,7 @@ export function SearchBar({ onSelect }: SearchBarProps) {
       controller.abort();
       window.clearTimeout(timeoutId);
     };
-  }, [query]);
+  }, [language, query]);
 
   function selectLocation(location: Location) {
     onSelect(location);
@@ -107,13 +110,13 @@ export function SearchBar({ onSelect }: SearchBarProps) {
           onChange={(event) => setQuery(event.target.value)}
           onFocus={() => query.trim().length >= 2 && setIsOpen(true)}
           onKeyDown={handleKeyDown}
-          aria-label="Найти город"
+          aria-label={translations.label}
           aria-controls="city-results"
           aria-expanded={isOpen}
           aria-autocomplete="list"
-          placeholder="Найти город…"
+          placeholder={translations.placeholder}
         />
-        {loading ? <span className="mini-loader" aria-label="Ищем города" /> : <kbd>⌘ K</kbd>}
+        {loading ? <span className="mini-loader" aria-label={translations.loading} /> : <kbd>⌘ K</kbd>}
       </div>
 
       {isOpen && (
@@ -139,8 +142,8 @@ export function SearchBar({ onSelect }: SearchBarProps) {
           {hasSearched && !loading && results.length === 0 && (
             <div className="search-empty">
               <span aria-hidden="true">◌</span>
-              <strong>Город не найден</strong>
-              <small>Проверьте название или попробуйте другой вариант.</small>
+              <strong>{translations.notFound}</strong>
+              <small>{translations.notFoundHint}</small>
             </div>
           )}
         </div>
