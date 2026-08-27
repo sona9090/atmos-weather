@@ -38,6 +38,7 @@ export default function App() {
   const [storedTheme, setStoredTheme] = useLocalStorage<StoredTheme>('atmos-theme', 'light');
   const [favorites, setFavorites] = useLocalStorage<Location[]>('atmos-favorites', []);
   const [locating, setLocating] = useState(false);
+  const [isThemeSelectOpen, setThemeSelectOpen] = useState(false);
   const [locationError, setLocationError] = useState<string | null>(null);
   const { data, loading, error, refetch } = useWeather(location, unit);
 
@@ -152,13 +153,33 @@ export default function App() {
               aria-pressed={unit === 'fahrenheit'}
             >°F</button>
           </div>
-          <label className="theme-select">
+          <label
+            className="theme-select"
+            onPointerDown={(event) => {
+              if (event.button === 0) setThemeSelectOpen((isOpen) => !isOpen);
+            }}
+          >
             <span className="visually-hidden">{text.themeAria}</span>
-            <select value={theme} onChange={(event) => setStoredTheme(event.target.value as DesignTheme)}>
+            <select
+              id="theme_select"
+              value={theme}
+              onBlur={() => setThemeSelectOpen(false)}
+              onKeyDown={(event) => {
+                if (['Enter', ' ', 'ArrowDown', 'ArrowUp'].includes(event.key)) setThemeSelectOpen(true);
+                if (['Escape', 'Tab'].includes(event.key)) setThemeSelectOpen(false);
+              }}
+              onChange={(event) => {
+                setStoredTheme(event.target.value as DesignTheme);
+                setThemeSelectOpen(false);
+              }}
+            >
               <option value="light">{text.lightTheme}</option>
               <option value="dark">{text.darkTheme}</option>
             </select>
-            <span aria-hidden="true">⌄</span>
+            <span
+              aria-hidden="true"
+              className={`theme-select-arrow${isThemeSelectOpen ? ' is-open' : ''}`}
+            />
           </label>
         </div>
       </header>
