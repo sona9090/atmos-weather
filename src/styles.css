@@ -465,8 +465,8 @@ a {
 	padding: 0 34px 0 12px;
 	color: var(--ink);
 	background: transparent;
-	border: 0;
-	outline: 0;
+	border: 0px;
+	outline: 0px;
 	appearance: none;
 	cursor: pointer;
 	font-size: 12px;
